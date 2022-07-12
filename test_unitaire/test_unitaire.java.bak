@@ -1,0 +1,20 @@
+import junit.framework.*;
+
+public class Test_unitaire extends TestCase
+{
+	protected void setUp()
+	{
+		
+	}
+	public static Test suite()
+	{
+		
+	}
+
+
+	public static void main(String arg[])
+	{
+		junit.textui.TestRunner.run(suite());
+	}
+};
+

@@ -1,0 +1,84 @@
+package test_unitaire;
+
+import junit.framework.*;
+import java.io.*;
+import compiler.*;
+import ast.*;
+
+public class Test_unitaire1 extends TestCase
+{
+	private String liste_fichier[];
+	private Fichier_test liste_fichier2[];
+
+	protected void setUp()
+	{
+		File f=new File("test");
+		ParserXML p=new ParserXML();
+		Fichier_test f2[]=p.parse("test_unitaire\\test.xml");
+		assert(f2!=null);
+		assert(f.exists());
+		assert(f.isDirectory());
+		/*liste_fichier=f.list(new FiltreFileName(".e"));
+		System.out.println("nb="+liste_fichier.length);*/
+		liste_fichier2=f2;
+	}
+
+	public static Test suite()
+	{
+//		TestSuite t=new TestSuite();
+		//t.addTest(new TestXmlSimple("test_unitaire\\test_class1.xml"));
+//		t.addTest(new Test_unitaire1());
+//		return t;//new TestSuite(Test_unitaire1.class);
+		return new TestSuite(Test_unitaire1.class);
+	}
+
+	public void testEgal()
+	{
+		assertEquals(12,12);
+	}
+
+	public void testParser()
+	{
+		int i;
+		Fichier_test fichier;
+		Compiler_Eiffel c;
+		String nom;
+
+		for(i=0;i<liste_fichier2.length;i++)
+		{
+			fichier=liste_fichier2[i];
+			assert(fichier!=null);
+			assert(fichier.nom!=null);
+			assert(fichier.nom!="");
+			nom="test\\"+fichier.nom;
+			File f=new File(nom);
+			assert(f.exists());
+			assert(!f.isDirectory());
+			//assert(Compiler_Eiffel.nb_erreur()==0);
+			c=new Compiler_Eiffel(nom);
+			assert(c.nb_erreur()==fichier.no_erreur):
+					"Difference nb erreurs "+nom+":"+
+					c.nb_erreur()+"!="+
+					fichier.no_erreur;
+            //Compiler_Eiffel.logging=new Logging();
+		}
+	}
+
+	public static void main(String arg[])
+	{
+		//assert(junit.textui.TestRunner!=null);
+		//if(arg.length>1)
+		//	junit.awtui.TestRunner.run(suite());
+		//else
+			junit.textui.TestRunner.run(suite());
+		//TestResult result= 
+		//suite().run(null);
+		//TestSuite suite=(TestSuite)suite();
+		//TestResult result= suite.run(suite);
+                /*AstXML ast=new AstXML();
+                Classe c=ast.parse("");
+                c.check_egal(c);*/
+                System.out.println("Fin des tests");
+	}
+};
+

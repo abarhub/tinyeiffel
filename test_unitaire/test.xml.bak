@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE toto:root SYSTEM "E:\projet\eiffel\test_unitaire\test.dtd">
+
+<!--
+xmlns:toto="http://www.w3c.org/"
+<!DOCTYPE root SYSTEM "E:\projet\eiffel\test_unitaire\test.dtd">
+-->
+
+<toto:root xmlns:toto="http://www.w3c.org/">
+	<!-- <toto:file nom="test1.e" nb_erreur="33" />
+	<toto:file nom="test2.e" nb_erreur="67" />
+	<toto:file nom="test3.e" nb_erreur="33" />
+	<toto:file nom="test4.e" nb_erreur="38" />
+	<toto:file nom="test5.e" nb_erreur="42" />
+	<toto:file nom="test6.e" nb_erreur="35" /> -->
+	<toto:file nb_erreur="8" nom="test8.e" />
+</toto:root>

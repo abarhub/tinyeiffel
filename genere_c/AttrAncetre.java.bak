@@ -1,0 +1,30 @@
+package genere_c;
+
+import ast.*;
+
+public class AttrAncetre implements Traite
+{
+	public AttrAncetre(NomFeature nom,Type type,int no)
+	{
+		assert(nom!=null);
+		assert(type!=null);
+		assert(no>=0);
+		this.nom=nom;
+		this.type=type;
+		this.no=no;
+	}
+
+	public void set_traite(boolean traite0)
+	{
+		this.traite=traite0;
+	}
+
+	public boolean get_traite()
+	{
+		return traite;
+	}
+
+	public NomFeature nom;
+	public Type type;
+	public int no;
+}

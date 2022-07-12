@@ -1,0 +1,8 @@
+ ---------------------------------------------------------
+ Sample file 2: 'How do I use MSS_LOG_BLOCK_LIST_FILTERED'
+ ---------------------------------------------------------
+
+The only purpose of this program is to show how the new feature (as of
+version 1.1 of MSS) MSS_LOG_BLOCK_LIST_FILTERED might be used. If you want
+more general information about that function, please check out the
+documentation.  To see an example of it's usage, see this sample-program.

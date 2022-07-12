@@ -1,0 +1,244 @@
+ ------------------------------------------------
+ Sample file 1: 'A simple and buggy String class'
+ ------------------------------------------------
+
+In this little mini-tutorial, we'll do some quick bug-hunting using MSS.
+I'm *only* using MSS to debug the sample code, because this has been written
+to show MSS' capabilities; a source level debugger would have helped for sure,
+but MSS is enough for this ;)
+
+
+Take a look at file 'test1_1.cc'. It is a quite simple and not very good String
+class with only 5 methods: two constructors, one destructor, one method to
+get the length of a string object and one to compare two strings.
+
+If you run 'test1_1' (or 'test1_1.exe under dos) after compiling it
+either manually or by using the makefile provided for GCC and DJGPP),
+everything will probably go OK and the program will show the correct output,
+which is:
+
+   equal
+   String lenght is: 17
+
+so everything seems to be OK,  you can play a little more with the class and
+probably won't get any problem. So we can assume that the class is free of
+bugs, at least free of severe bugs that can cause fatal errors, right?
+
+WRONG! Hiding under that apparently correct behaviour the code has 2 *SEVERE*
+bugs that can cause erratic behaviour and memory corruption. This situation
+will tipically arise when we have written some thousands of lines of code that
+uses this class, and the bug will be *hard* to detect and isolate, specially
+if you assumed that the simple 'String' class was correct.
+
+
+  ------------------------------
+* Discovering the invisible bugs:
+  ------------------------------
+
+Now, what does MSS say? Take a look at the 'mss.log' file generated when you
+executed 'test1_1'. Any warning? YES! 3 of them. But let's analyze the log
+file step by step:
+
+
+1 - MSS logs a memory allocation, corresponding to the constructor 2.
+----------------------------------------------------------------------------
+LOG: String::String(const char *) (line 49 of test1_1.cc) allocated 17 bytes 
+     at 691a0 using `new[]'.
+----------------------------------------------------------------------------
+
+2 - Again, MSS logs a memory allocation, corresponding to the constructor 2.
+----------------------------------------------------------------------------
+LOG: String::String(const char *) (line 49 of test1_1.cc) allocated 17 bytes 
+     at 69120 using `new[]'.
+----------------------------------------------------------------------------
+
+3 - MSS logs a memory deallocation, corresponding to the class destructor.
+    The deleted block is the same that was allocated in the previous log,
+    starting at dir. 69120.
+----------------------------------------------------------------------------
+LOG: String::~String() (line 61 of test1_1.cc) deallocated a block at 69120 
+     (no label) using `delete[]' previously allocated by `new[]' in 
+     String::String(const char *) (line 49 of test1_1.cc).
+----------------------------------------------------------------------------
+
+4 - Here the alarm sounds: MSS detects that the block being deleted, the one
+    from the previous 2 logs, has been overrun somewhere. So here we detect
+    the 1st bug: somewhere we are writing out of the bounds of this block.
+    More specifically, past the end of the block, since MSS tells that is
+    the SUFFIX the corrupted part (not the PREFIX).
+------------------------------------------------------------------------------
+WARNING: Access out of range; SUFFIX of block at 69120 (no label) sized 17 
+         bytes, allocated by String::String(const char *) (line 49 of 
+         test1_1.cc), has been corrupted.
+------------------------------------------------------------------------------
+
+5 - And once again, the alarm rings: MSS detects a deallocation of a
+    non-existent block. In line 61 of test1.cc we are doing a delete on a
+    pointer that does not point to a valid block start. This is the second
+    bug.
+------------------------------------------------------------------------------
+WARNING: String::~String() (line 61 of test1_1.cc) tried to deallocate a block 
+         at 69120 using `delete[]' that wasn't allocated.
+------------------------------------------------------------------------------
+
+6 - Now comes a correct log of a deallocation done by the destructor of the
+    class:
+------------------------------------------------------------------------------
+LOG: String::~String() (line 61 of test1_1.cc) deallocated a block at 691a0
+     (no label) using `delete[]' previously allocated by `new[]' in 
+     String::String(const char *) (line 49 of test1_1.cc).
+------------------------------------------------------------------------------
+
+7 - And now, once again, MSS detects that the block being deallocated has been
+    written out of bounds:
+------------------------------------------------------------------------------
+WARNING: Access out of range; SUFFIX of block at 691a0 (no label) sized 17 
+         bytes, allocated by String::String(const char *) (line 49 of 
+         test1_1.cc), has been corrupted.
+------------------------------------------------------------------------------
+
+  So here we are: an incorrect deallocation and two out-of-bounds writings
+in an apparent correct piece of code running OK. Now it won't be hard to
+find these bugs, since we know their nature. At least we know that they exist!
+
+
+
+*********
+First bug:
+*********
+
+Out of bound accesses. This situation is detected in the destructor,
+line 49 of the file. The line is:
+
+  delete [] str;
+
+so somewhere we step out of the block pointed by str and write out of bounds.
+There's only one place where we write to this block: in the constructor 2,
+when we copy the parameter string passed to the constructor. Let's concentrate
+on that method. If you're not a beginner, you'll soon discover the bug, but
+let's assume you can't see it by examining the code. Let's ask MSS to validate
+any pointer before every write in this method. Examine the destructor 2 in
+the file test1_2.cc. We have added a MSS_CHECK_POINTER_VALIDITY(str) before
+any write to the memory pointed by 'str'. now compile and run 'test1_2.cc'
+Take a look at the generated mss.log file. You'll notice a bunch of msgs like
+these:
+
+------------------------------------------------------------------------------
+MSG: Pointer validity check requested for pointer 691a0, in 
+     String::String(const char *) (line 54 of test1.cc):
+
+MSG: Pointer p = 691a0 points to position 0 of a block (no label) sized 17
+     bytes allocated by String::String(const char *) (line 49 of test1.cc)
+------------------------------------------------------------------------------
+MSG: Pointer validity check requested for pointer 691a0, in 
+     String::String(const char *) (line 54 of test1.cc):
+
+MSG: Pointer p = 691a0 points to position 1 of a block (no label) sized 17
+     bytes allocated by String::String(const char *) (line 49 of test1.cc)
+------------------------------------------------------------------------------
+MSG: Pointer validity check requested for pointer 691a0, in 
+     String::String(const char *) (line 54 of test1.cc):
+
+MSG: Pointer p = 691a0 points to position 2 of a block (no label) sized 17
+     bytes allocated by String::String(const char *) (line 49 of test1.cc)
+------------------------------------------------------------------------------
+
+(... a lot more changing only the position in the block...)
+
+------------------------------------------------------------------------------
+MSG: Pointer validity check requested for pointer 691a0, in 
+     String::String(const char *) (line 54 of test1.cc):
+
+MSG: Pointer p = 691a0 points to position 16 of a block (no label) sized 17
+     bytes allocated by String::String(const char *) (line 49 of test1.cc)
+------------------------------------------------------------------------------
+
+So here we get 17 correct consecutive pointer checks, that correspond to the
+17 iterations of the 'while' loop in the constructor. OK, the bug is not here,
+then. Let's continue looking through the logfile.
+
+Here! Look at this:
+------------------------------------------------------------------------------
+MSG: Pointer validity check requested for pointer 691b1, in 
+     String::String(const char *) (line 58 of test1.cc):
+
+WARNING: Pointer 691b1 does not belong to any valid allocated block.
+
+MSG: Nearest block start is at 691a0 (no label) (distance = 17 bytes), sized 
+     17 bytes, allocated by String::String(const char *) (line 49 of 
+     test1.cc)
+
+MSG: Nearest block end is at 691b0 (no label) (distance = 1 bytes), sized 17
+     bytes, allocated by String::String(const char *) (line 49 of test1.cc)
+------------------------------------------------------------------------------
+
+So here it is! The pointer is pointing to the first byte after the end of
+the string block! So the writing after line 58 is invalid: here's the bug!
+
+(...)
+  //add the \0 terminator
+  MSS_CHECK_POINTER_VALIDITY(aux1);    //check before you write
+  *aux1=0;  <----HERE!
+(...)
+
+The *aux=0 sentence is writing out of bounds. One byte out. With very little
+imagination you'll discover that the problem is that the constructor is
+allocating *one char less* than it should, since when it calculates the length
+of the string, it does not count the trailing '\0' terminator.
+So the code is fixed by changing:
+
+  //allocate space for the string
+  aux1=str=new char [length];
+
+by this:
+
+  //allocate space for the string+1 for the \0 terminator
+  aux1=str=new char [length+1];
+
+First bug detected and destroyed. ;)
+
+
+***********
+Second bug:
+***********
+
+    The warning happens because the destructor tries to deallocate a
+non-existent block, that is, the pointer does not point to any valid block
+start. If we take a careful look at the WARNING in the log file, we'll see
+that the direction of the non-existent valid block is 69120. Wait! I've seen
+this number before... of course! take a look at the previous deallocation logs,
+and you'll see one like this:
+
+----------------------------------------------------------------------------
+LOG: String::~String() (line 61 of test1.cc) deallocated a block at 69120 <--
+     (no label) using `delete[]' previously allocated by `new[]' in ^^^^^
+     String::String(const char *) (line 49 of test1.cc).
+----------------------------------------------------------------------------
+
+So what?!  THE BLOCK WAS YET DEALLOCATED! That's the reason of the warning:
+we are trying to deallocate the same block TWICE! The destructor is being
+called twice with the same 'ptr' attribute in the victim object. Hmmmm...
+How can it be?
+
+Let's see: the destructors are called when the program finishes... we should
+get 2 delete[] logs, since the first empty object does not execute any
+deallocation, but we get *3* delete[] logs coming from destructors, one of
+them redundant and unwanted. 2 of them for sure correspond to the destruction of
+objects str2 and str3 at program exit, but... what about the other?
+
+Take a look at main() in file 'test1_3.cc'. We have used MSS_LOG_MSG(msg) to
+'mark' the logfile and divide it in code zones, so we can see when and where
+the calls to the destructors happen. We 'break' the code in 4 zones. Compile
+and run 'test1_3.cc'. Looking into the generated logfile, we see that the
+first deallocation happens in the 'IF' zone, and the two others at program
+exit. Here is the bug! Why is a destructor called in the 'IF' zone?
+The thing must be in the call to 'is_equal_to' method. If you're not a beginner,
+you'll discover it soon: The 'String' parameter! since we haven't defined a
+copy constructor, and we are passing a parameter by value, a temporary object
+is created, copied and...*DESTROYED* at function exit! Note that this is
+a real SEVERE bug, since after every call to method 'is_equal_to' will result
+in freeing the memory used by the comparing object, so you'll end up using
+not allocated memory!
+
+Passing the argument by reference or writing a copy constructor for the class
+will finally fix the bug.

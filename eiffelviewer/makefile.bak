@@ -1,0 +1,18 @@
+all:
+	javac JavaViewer.java
+
+
+run:
+	java -Djava.library.path=C:\j2sdk1.4.0\SWT2.1 JavaViewer
+
+run2:
+	java -Djava.library.path=. JavaViewer
+
+run3:
+	redir -e toto.txt java -Djava.library.path=C:\j2sdk1.4.0\SWT2.1 JavaViewer
+
+all2:
+	javac StyledTextExample.java
+
+run2:
+	java -Djava.library.path=C:\j2sdk1.4.0\SWT2.1 StyledTextExample

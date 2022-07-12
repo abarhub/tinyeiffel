@@ -1,0 +1,33 @@
+SAMPLES README for version 1.2 of MSS
+-----------------------------------------------------------------------
+
+This directory contains some sample files which can be compiled either
+manually (linking with the latest version of the MSS library) or if you
+are using GCC/DJGPP you can use the makefile provided.
+
+It also contains some configuration file samples, mss.cfg and mssglobl.cfg.
+
+
+
+Sample Programs:
+
+These files were written for you to study and learn some of the capabilities
+of MSS and how to use it for finding bugs.  Currently however there is a lack
+of sample programs, and more will hopefully show up in a shortly. So don't
+think that these sample files show ALL of the power in MSS. It merely shows
+a tiny bit, but enough to get you started I think.
+
+
+Sample 1: 'A simple and buggy String class'
+          Shows some basic features of MSS and one way to use it to debug
+          your programs making it easier to find tricky memory related bugs.
+          Consists of three files: test1_1.cc, test1_2.cc and test1_3.cc.
+          See test1.txt for more information.
+
+Sample 2: 'How do I use MSS_LOG_BLOCK_LIST_FILTERED'
+          The only purpose of this program is to show how the new feature
+          (as of version 1.1 of MSS) MSS_LOG_BLOCK_LIST_FILTERED might be
+          used. See test2.txt and the documentation for more information.
+
+
+

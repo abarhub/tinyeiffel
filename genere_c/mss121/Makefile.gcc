@@ -1,0 +1,210 @@
+# Makefile for MSS version 1.2.1
+# Written by Peter Palotas in 1998
+# Updated by Laurynas Biveinis in 2001
+#
+# This makefile is written for use with GNU Make, GNU Fileutils, and GCC,
+# under Linux or DJGPP.
+#
+# I know this makefile is all messy and	so, but	it works anyway.
+#
+# There are a few rules in this makefile, which are listed here.
+#
+# make all:
+# This will compile everything, including the library and test-programs.
+# The library will be placed in lib/[linux|djgpp]/libmss.a, and the
+# testprograms will be placed in the ./samples/ directory.
+#
+# make lib:
+# This will compile the library only.
+#
+# make test:
+# This will compile the test programs, and the library if it is not present.
+# (Same as make all)
+#
+# make install:
+# This will install the library to /usr/local/lib/libmss.a under linux, or
+# %DJDIR%/lib/libmss.a under DJGPP, and the header files will go in
+# /usr/local/include under linux, and %DJDIR%/include under DJGPP.
+# You can change LIBDEST and INCLUDEDIR below (under either the DJGPP or
+# linux section) if you want these files installed to another place.
+#
+# make clean:
+# This will remove all objectfiles for the specific environment, i.e.
+# if `make clean' is run under Linux it won't remove the DJGPP object
+# files, and vice versa.
+#
+# make cleanall:
+# This will remove all rebuildable files, excluding any installed ones.
+#
+# make uninstall:
+# This will uninstall any installed files, i.e. remove them.
+#
+# If you are compiling on a system which lacks C++ support, you	want to
+# uncomment the	line below. Otherwise you don't! =)
+#NOCPP=.
+
+# CC ofcourse should point to your compiler, preferrably gcc.
+CC=gcc
+
+# AR should point to your archiver. (Should probably be `ar')
+AR=ar
+
+# Compiler flags and stuff.
+CFLAGS=-O2 -mcpu=i686 -W -Wall -Werror -I. -ansi -pedantic -DMSS
+ARFLAGS=rcs
+
+#Uncomment the line below if you're debugging MSS. (if you are not a
+#developer, you	don't want to uncomment	this, 'cause it	won't help you
+#anything.  (This is not for debugging YOUR program, but for debugging MSS!
+#DEBUG=.
+
+#If you	don't have a GCC with support for stabs	debugging information,
+#get it! (Or you could replace -gstabs+	below with ex. -g)
+DEBUGFLAGS=-DMSS_DEBUG -gstabs+
+
+# The version of MSS
+VERSION=1.2.1
+
+# -------- target OS (djgpp or linux) --------
+ifdef DJDIR
+TARGET=djgpp
+else
+TARGET=linux
+endif
+
+ifdef DEBUG
+DFLAGS=$(DEBUGFLAGS)
+else
+DFLAGS=
+endif
+
+ifeq ($(TARGET),djgpp)
+# -------- djgpp specific stuff	-----------
+#
+# Change this if you want to install the files in some other directory.
+#
+LIBDEST=$(DJDIR)/lib/libmss.a
+INCLUDEDIR=$(DJDIR)/include
+
+# Don't change anything below!
+OBJDIR=objs/djgpp
+LIBDIR=lib/djgpp
+EXE_SUFFIX=.exe
+
+else
+ifeq ($(TARGET),linux)
+# -------- linux specific stuff	-----------
+#
+# Change this if you want to install the files in some other directory.
+#
+LIBDEST=/usr/local/lib/libmss.a
+INCLUDEDIR=/usr/local/include
+
+# Don't change anything below!
+OBJDIR=objs/linux
+LIBDIR=lib/linux
+EXITDEP=
+EXE_SUFFIX=
+
+else
+.PHONY:	badtarget
+badtarget:
+	@echo Error: target operating system not properly set.
+	@echo 	     try running `make TARGET=djgpp' or	`make TARGET=linux'
+	@echo	     If you are using another operating system, you probably
+	@echo	     need to tweak the makefile a whole lot.
+	@echo	     Makefiles for other targets will be included in the
+	@echo	     distribution if they are provided to us. (See the docs
+	@echo	     for more info).
+endif
+endif
+
+# Make neccessary modifications	if no c++ compiler is available.
+ifndef NOCPP
+CPPSPEC_O=$(OBJDIR)/cppspec.o
+else
+CPPSPEC_O=
+endif
+
+.PHONY:	all lib install clean cleanall uninstall test
+
+all: lib test
+
+lib: $(LIBDIR)/libmss.a
+	@echo The MSS library is compiled and placed in $(LIBDIR)/libmss.a
+	@echo
+
+test: lib
+	@echo About to make the test programs in the ./sample/ directory.
+	@echo
+	@cd samples ; make ; cd ..
+
+
+$(OBJDIR)/list.o: list.c list.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/list.o list.c
+
+$(OBJDIR)/inifile.o: inifile.c list.h inifile.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/inifile.o inifile.c
+
+$(OBJDIR)/alloc.o: internal.h mss.h alloc.c
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/alloc.o alloc.c
+
+$(OBJDIR)/check.o: check.c internal.h mss.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/check.o check.c
+                           
+$(OBJDIR)/config.o: internal.h config.c mss.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/config.o config.c
+
+$(OBJDIR)/init.o: init.c internal.h mss.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/init.o init.c
+
+$(OBJDIR)/internal.o: internal.c internal.h mss.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/internal.o internal.c
+
+$(OBJDIR)/log.o: log.c internal.h mss.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/log.o log.c
+
+$(OBJDIR)/user.o: user.c internal.h mss.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/user.o user.c
+
+$(OBJDIR)/cppspec.o: cppspec.cc	mss.h internal.h
+	$(CC) -c $(DFLAGS) $(CFLAGS) -o $(OBJDIR)/cppspec.o cppspec.cc
+
+$(LIBDIR)/libmss.a: $(CPPSPEC_O) $(OBJDIR)/alloc.o $(CPPSPEC_O) $(OBJDIR)/list.o \
+ 		    $(OBJDIR)/inifile.o $(OBJDIR)/check.o $(OBJDIR)/config.o \
+		    $(OBJDIR)/init.o $(OBJDIR)/internal.o $(OBJDIR)/log.o \
+		    $(OBJDIR)/user.o
+	@echo Creating the library as $(LIBDEST)...
+	$(AR) $(ARFLAGS) $(LIBDIR)/libmss.a $(OBJDIR)/alloc.o \
+		$(OBJDIR)/check.o \
+		$(CPPSPEC_O) \
+		$(OBJDIR)/config.o \
+		$(OBJDIR)/init.o \
+		$(OBJDIR)/internal.o \
+		$(OBJDIR)/log.o \
+		$(OBJDIR)/user.o \
+		$(OBJDIR)/list.o \
+		$(OBJDIR)/inifile.o
+
+install: lib
+	@echo Installing the library and necessary include files...
+	@cp $(LIBDIR)/libmss.a $(LIBDEST)
+	@cp mss.h $(INCLUDEDIR)
+	@cp no_mss.h $(INCLUDEDIR)
+	@echo MSS version $(VERSION) installed.
+
+clean:
+	@echo Removing object files...
+	@rm -f $(OBJDIR)/*.o
+	@cd samples ; make clean ; cd ..
+
+cleanall: clean
+	@echo Removing all rebuildable files...
+	@rm -f $(LIBDIR)/libmss.a
+	@cd samples ; make cleanall ; cd ..
+
+uninstall:
+	@echo Removing any installed files...
+	@rm -f $(LIBDEST)
+	@rm -f $(INCLUDEDIR)/mss.h
+

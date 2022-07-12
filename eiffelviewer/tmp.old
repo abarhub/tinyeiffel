@@ -1,0 +1,31 @@
+class JavaViewer
+
+public StyledText create_text(Composite/*Shell*/ win)
+{
+	StyledText t = new StyledText (win, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+	GridData spec = new GridData();
+	spec.horizontalAlignment = GridData.FILL;
+	spec.grabExcessHorizontalSpace = true;
+	spec.verticalAlignment = GridData.FILL;
+	spec.grabExcessVerticalSpace = true;
+	t.setLayoutData(spec);
+	JavaLineStyler l=new JavaLineStyler();
+	t.addLineStyleListener(l);
+	lineStyler_fichier.add(l);
+	text_fichier.add(t);
+	return t;
+}
+
+void createStyledText() {
+	text = new StyledText (shell, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+	GridData spec = new GridData();
+	spec.horizontalAlignment = GridData.FILL;
+	spec.grabExcessHorizontalSpace = true;
+	spec.verticalAlignment = GridData.FILL;
+	spec.grabExcessVerticalSpace = true;
+	text.setLayoutData(spec);
+	text.addLineStyleListener(lineStyler);
+	//text.setEditable(false);
+	//Color bg = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+	//text.setBackground(bg);
+}

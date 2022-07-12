@@ -1,0 +1,138 @@
+#include <stdio.h>
+
+#define TEIF_Bool int
+
+struct TEIF_Classe;
+struct TEIF_Expr;
+
+struct TEIF_Type
+{
+	char *nom;
+	TEIF_Bool est_like,is_from,expanded;
+	TEIF_Type *generique[];
+	int taille_generique;
+	TEIF_Expr *like;
+};
+
+struct TEIF_Chaine
+{
+	char *liste[];
+	int taille_liste;
+};
+
+struct TEIF_Indexing
+{
+	char *nom;
+	char *liste[];
+	int taille_liste;
+};
+
+struct TEIF_Expr
+{
+	enum{TEIF_Var,TEIF_Entier} type;
+	enum {Plus=1,Moins=2,Fois=3,Div=4,Div_entier=5,Chaine=6,Entier=7,
+		Reel=8,Char=9,Vrai=10,Faux=11,Mod=12,Old=13,Not=14,PlusU=15,MoinsU=16,
+		Point=17,Puiss=18,Xor=19,Or=20,And=21,And_Then=22,Or_Else=23,Implies=24,
+		Egal=25,Diff=26,Infs=27,Inf=28,Sup=29,Sups=30,Appel=31,Var=32,Tableau=33,
+		Free_Op=34,Free_OpU=35,Dollard=36} op;
+	TEIF_Type *type_retour;
+	TEIF_Bool erreur;
+	TEIF_Classe *classe;
+	char *nom,*free_op,*str;
+	TEIF_Expr *parametre[],*expr1,*expr2,*tableau[];
+	TEIF_Chaine *str2;
+};
+
+struct TEIF_Assert
+{
+	char *nom;
+	TEIF_Expr *expr;
+};
+
+struct TEIF_Instr
+{
+	enum{TEIF_Affect,TEIF_Appel,TEIF_Check,TEIF_Creation,TEIF_Debug,
+	    TEIF_Else,TEIF_ElseIf,TEIF_If,TEIF_Inspect,TEIF_Loop,TEIF_Retry,
+	    TEIF_TentAffect} type;
+	TEIF_Expr *expr,*parametre[],*variant,*when[]/*double tableau*/;
+	char *nom,*var_current,*nom2;
+	TEIF_Instr *suivant,*instr[],*liste_instr[],*from[],*loop[];
+	TEIF_Assert *liste_expr[],*invariant[];
+	TEIF_Type *type_creation;
+	TEIF_Chaine *chaine[];
+	int taille_parametre,taille_when,taille_instr,taille_liste_instr,
+	    taille_from,taille_loop,taille_liste_expr,taille_invariant,
+	    taille_chaine;
+};
+
+struct TEIF_NomFeature
+{
+	enum{TEIF_Nom_Normal,TEIF_Nom_Operateur} type;
+	TEIF_Bool prefix,infix;
+	char *nom;
+	TEIF_Chaine *nom2;
+};
+
+struct TEIF_DeclareVar
+{
+	char *nom;
+	TEIF_Type *type;
+};
+
+struct TEIF_Commentaire
+{
+	char *str;
+};
+
+struct TEIF_Feature
+{
+	enum{TEIF_FeatureAttr,TEIF_FeatureDeferred,TEIF_FeatureExpr,
+	    TEIF_FeatureExternal,TEIF_FeatureRoutine,TEIF_FeatureUnique} type;
+	TEIF_NomFeature *liste_nom[];
+	TEIF_DeclareVar *param[],*local[];
+	TEIF_Assert *require[],*ensure[];
+	TEIF_Type *type_retour,*export0[];
+	TEIF_Instr *rescue[],*liste_instr[];
+	TEIF_Commentaire *commentaire1[],*commentaire2[],*commentaire3[];
+	TEIF_Chaine *obsolete,*str,*alias;
+	TEIF_Classe *classe;
+	TEIF_Expr *expr;
+	TEIF_Bool once;
+};
+
+struct TEIF_Heritage
+{
+	TEIF_Type *type,*export_[];
+	TEIF_NomFeature *rename[],*undefine[],*redefine[],*select[];
+	int taille_export,taille_rename,taille_undefine,
+	    taille_redefine,taille_select;
+};
+
+struct TEIF_Creation
+{
+	TEIF_Type *type[];
+	TEIF_NomFeature *nom_fonction[];
+	int taille_type,taille_nomf;
+};
+
+struct TEIF_Classe
+{
+	TEIF_Bool deferred,expanded;
+	TEIF_Type *type;
+	TEIF_Feature *feature[];
+	TEIF_Heritage *heritage[];
+	TEIF_Assert *invariant[];
+	TEIF_Creation *creation[];
+	TEIF_Chaine *obsolete;
+	TEIF_Indexing *index[];
+	char *commentaires[];
+	int taille_feature,taille_heritage,taille_invariant,
+	    taille_creation,taille_index,taille_commentaire;
+};
+
+int main()
+{
+	printf("Hello, world\n");
+	
+	return 0;
+}

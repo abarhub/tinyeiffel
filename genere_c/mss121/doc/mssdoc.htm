@@ -1,0 +1,1381 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>MSS - Memory Supervision System Version 1.2.1 Documentation</TITLE>
+<META NAME=&quot;keywords&quot; CONTENT=&quot;mss,documentation,malloc,new,delete,programming,c,c++,dynamic,memory,allocation,free,djgpp,gcc,linux,watcom,borland,dYnamic,mEmory,aLlocation,Dynamic,Memory,Allocation,debugging,library,bugs, finding">
+<!--<META NAME=&quot;description&quot; CONTENT=&quot;MSS is a free (GPL) C/C++ library that helps you in the infamious task of finding bugs related to dynamical memory during the development of your programs.">-->
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#FF0000" VLINK="#800000" ALINK="#0000FF">
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%">  
+<TR>
+<TD BGCOLOR="#C0C0FF">
+<H1 ALIGN="center"><FONT COLOR="#000080">MSS - Memory Supervision System Version 1.2.1 Documentation</FONT>
+</H1>
+</TD>
+</TR>
+<TR>
+<TD BGCOLOR="#FFC0C0">
+Written by<BR>
+Juan Jesus Alcolea Picazo, <A HREF="mailto:a920101@zipi.fi.upm.es">a920101@zipi.fi.upm.es</A><BR>
+Peter Palotas, <A HREF="mailto:blizzar@hem1.passagen.se">blizzar@hem1.passagen.se</A><BR>
+and some fixes from Laurynas Biveinis <A HREF="mailto:lauras@softhome.net">lauras@softhome.net</A>
+</TD>
+</TR>
+<TR VALIGN="MIDDLE">
+<TD BGCOLOR="#FFFFC0" VALIGN="MIDDLE">
+Version 1.2.1, Last updated <!--Webber_Auto_StampDNR--><!--DS-->1998-11-12<!---->
+</TD>
+</TR>
+</TABLE> 
+
+
+<P><HR>
+<EM>This is the complete documentation for MSS, the Memory Supervision
+System version 1.2.1, written by Juan Jesus Alcolea Picazo and Peter Palotas.</EM>
+<HR></P>
+
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><B>Contents</B></FONT></FONT>
+</TR></TD></TABLE>
+<P>
+<UL>
+<A HREF="#introduction">1. Introduction</A><BR>
+<A HREF="#compiling-and-installing-mss">2. Compiling and installing MSS</A><BR>
+<A HREF="#using-mss">3. Using MSS</A><BR>
+<A HREF="#configuring-mss">4. Configuring MSS</A><BR>
+<A HREF="#function-reference">5. Function Reference</A><BR>
+<A HREF="#history">6. History</A><BR>
+<A HREF="#contacting-the-authors">7. Contacting the authors</A><BR>
+<A HREF="#copyright">8. Copyright</A><BR>
+</UL>
+</P>
+<HR>
+
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="introduction"><B>1. Introduction</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#what-is-mss">1.1 What is MSS?</A><BR>
+<A HREF="#but-what-does-it-really-do">1.2 But what does it really do?</A><BR>
+<A HREF="#does-it-work-with-my-compiler">1.3 Does it work with my compiler</A><BR>
+<A HREF="#do-i-have-to-pay-for-mss">1.4 Do I have to pay for MSS?</A><BR>
+<A HREF="#where-can-i-get-mss">1.5 Where can I get the latest version of MSS?</A><BR>
+</UL>
+</P>
+
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="what-is-mss"><B>
+1.1 What is MSS?
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>During the development of C/C++ programs dynamic memory is often allocated
+using either the standard C <I>malloc</I> family of functions or the C++
+operators <I>new </I>and<I> delete. </I>When allocating and using dynamical
+memory, the programmer often make mistakes which might lead to errors during
+program execution, so called <I>bugs</I>. This could be that the program
+&quot;forgets&quot; to delete/free some memory (so called <I>memory leaks</I>),
+tries to access more memory than it allocated and a lot more. Discovering
+and tracking these errors is a very difficult task, and often the errors
+go by without the programmer noticing them because the program may appear to work correctly
+anyway. Therefore MSS was developed, to assist programmers in detecting
+such bugs and producing better programs.</P>
+
+<P>MSS is a free (<A HREF="copying.txt">GPL</A>) C/C++
+library that helps you in the infamious task of finding bugs related to
+dynamical memory during the development of your programs. With MSS you
+will easily be able to detect the following bugs in your programs:</P>
+
+<UL>
+<LI>Memory leaks </LI>
+<LI>Use of uninitialized memory </LI>
+<LI>Zero-length allocations </LI>
+<LI>Out of range block accesses </LI>
+<LI>Bogus or repeated deallocations </LI>
+<LI>Unsuccessful allocations </LI>
+<LI>&quot;Wild&quot; or corrupted pointers </LI>
+<LI>And more...</LI>
+</UL>
+
+<P>MSS can also give you a lot of information about the state of the dynamical
+memory allocated by your program at any point during the execution, for
+example: </P>
+
+<UL>
+<LI>Total allocated memory </LI>
+<LI>Maximum allocated memory since program start </LI>
+<LI>Number of specific allocation/deallocation functions successfully called</LI>
+<LI>Number of blocks allocated </LI>
+<LI>List of blocks allocated, including the module, function and line number
+where the allocation took place. </LI>
+</UL>
+
+<P>MSS is also <B><I>very easy</I></B> to use. Your current sources will 
+only require <I>minor</I> changes, to enable the usage of MSS.</P>
+
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="but-what-does-it-really-do"><B>
+1.2 But what does it really do?
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>MSS filters all your calls to the C functions malloc(), calloc(), realloc(), xmalloc(), xrealloc(), xfree(), cfree(), free() and strdup() and if you have a C++ compiler, also the
+C++ operators 'new' and 'delete'. It keeps an internal list of all the allocated blocks, together with information about where the
+memory was allocated, how it was allocated and some other information.</P>
+
+<P>All interesting events, such as memory allocations/deallocations, detected bugs and so on are written to a log file (which also
+may be one of the standard streams stdout or stderr) which reflects all the dynamic memory related activities of your program.</P>
+
+<P>You are also provided with a set of functions to control various features of MSS, and to get some interesting info in run-time,
+such as maximum used dynamic memory since program start and a lot of others.</P>
+
+<P>You can also check that allocated memory blocks are still valid (constant blocks), that no out of range writings has occured.
+You can check if a certain pointer points to a valid block of memory, and a lot of other things.</P>
+
+<P>When you are ready to release your project you do not have to remove all calls to the MSS function calls, because they will all compile away to nothing if you have not defined the symbol &quot;MSS&quot; to the preproccessor.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="does-it-work-with-my-compiler"><B>
+1.3 Does it work with my compiler?
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>MSS was written with the intention of being fully portable to any compiler/platform
+that supports the ANSI&nbsp;C/C++ standard. Since the C++ ANSI&nbsp;standard
+was just recently finished however, there are a lot of diffrent C++ dialects
+out there, and some may not be fully compatible with the C++ section of
+MSS. Some configuring options were therefore added to make MSS&nbsp;support
+as many compilers as possible. The C section of MSS however, should be
+fully ANSI compliant and therefore work with all ANSI&nbsp;compatible C&nbsp;compilers, with only minor configuration.</P>
+
+<P>MSS&nbsp;was written using GCC 2.7.2.1, and has also been tested using
+GCC&nbsp;2.8.0, GCC 2.8.1, EGCS-1.1 and GCC 2.95.3 and it compiles without any problems on these compilers.
+This also goes for the excellent DJGPP, the DOS&nbsp;port of GCC (with which MSS actually was developed). If your
+compiler is a 32-bit compiler for the i386 family of processors, building
+MSS should be no problems, other platforms are untested, but any reports
+of successful (or unsuccessful) usage of MSS&nbsp;are very welcome.</P>
+
+<P>Currently there are two "makefiles" supplied with this package. One makefile was written for usage with
+the GNU C/C++ compiler (GCC) and GNU Make. (It will also require the GNU
+Fileutils for some operations), this is called "Makefile".  The other one is a project-file for Borland C++ 5.02, composed 
+by Rolf F. Katzenberger, this one is called "borland.ide". However we really would like to include
+more makefiles with MSS, so if you have another compiler, and are able
+to write a makefile for it, please do so and send it to us. We will be
+glad to include it in our next release.</P>
+
+<P>If you use another compiler, and can't seem to get MSS to work with it,
+don't hesitate to <A HREF="#contacting-the-authors">contact us</A>. We will do everything we can to help you.</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="do-i-have-to-pay-for-mss"><B>
+1.4 Do I have to pay for MSS?
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>No, you will never have to pay anything for using MSS. MSS is free software;
+you can redistribute it and/or modify it under the terms of the <A HREF="copying.txt">GNU
+General Public License</A> as published by the <A HREF="http://www.fsf.org/">Free
+Software Foundation</A>; either version 2 of the License, or (at your option)
+any later version.</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="where-can-i-get-mss"><B>
+1.5 Where can I get the latest version of MSS?
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>The latest version of MSS can always be found at <A HREF="http://hem1.passagen.se/blizzar/mss/index.html">http://hem1.passagen.se/blizzar/mss/index.html</A>.</P>
+
+<P>MSS is also available from various FTP-sites.  Among others it should be available from <A HREF ="ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2tk/mss12.zip">ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2tk/mss12.zip</A> and ofcourse from any other simtelnet mirror. Note that it is <EM>not</EM> a DJGPP specific version, but it will (should) work with any ANSI C compliable compiler.</P>
+
+<HR>
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="compiling-and-installing-mss"><B>2. Compiling and Installing MSS</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#unpacking-the-archive">2.1 Unpacking the archive</A><BR>
+<A HREF="#configuring-mss-for-your-compiler">2.2 Configuring MSS for your compiler</A><BR>
+<A HREF="#compiling-and-installing-mss-using-gcc">2.3 Compiling and installing MSS using GCC</A><BR>
+<A HREF="#compiling-and-installing-mss-using-borland">2.4 Compiling and installing MSS using Borland C++ 5.02</A><BR>
+<A HREF="#compiling-and-installing-mss-using-other-compiler">2.5 Compiling and installing MSS using another compiler.</A>
+</UL>
+</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="unpacking-the-archive"><B>
+2.1 Unpacking the archive
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>You have to unpack the archive preserving the directory structure. Depending on your platform there are diffrent was to do this, but under linux the 'unzip' program automagically preserves the directory structure, and in DOS you should specify the '-d' switch to 'pkunzip'.</P>
+
+<P>Start by unpacking the archive in a proper directory, under DJGPP we recommend &quot;%DJDIR%/contrib/&quot;, i.e. the contrib directory in the directory where you installed DJGPP, usually 'C:\DJGPP\CONTRIB\' or something like that.
+
+<PRE>
+pkunzip -d mss12.zip
+or
+unzip mss12.zip
+</PRE>
+
+MSS will unzip itself into its own directory, './mss12/' (under DJGPP this will be %DJDIR%/contrib/mss12 if you
+followed the above recommendation), so there is no need to create a separate directory for MSS before unzipping the archive.
+<P>If you are using GCC, either under DOS or Linux this is a pretty easy task.
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="configuring-mss-for-your-compiler"><B>
+2.2 Configuring MSS for your compiler
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>There are some configuring options available to make MSS more portable to diffrent compilers. These options can be found in the file `mss.h&acute;, and consist of preprocessor directives (<CODE>#define</CODE> statements) in the beginning of the file (all marked clearly with comments). Some options may need to be defined to a specific value, and others control the behaviour of MSS by being enabled/disabled which is achieved by commenting out a <CODE>#define</CODE> statement, or leaving it uncommented.</P>
+<P>The following options may be configured in `mss.h&acute;:</P>
+<TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_PTR_SIZE_T</CODE></TD>
+<TD BGCOLOR="#C0C0FF">This option <I>must</I> be defined. It should be defined to an integer type that is large enough
+   to hold the value of a pointer. Default value for this is <CODE>size_t</CODE>.</TD></TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_PRINTF_SIZE_T</CODE></TD>
+<TD BGCOLOR="#C0C0FF">This option <I>must</I> be defined. It should be defined to a type specifyer string constant that will 
+make printf() correctly print an argument of type <CODE>MSS_PTR_SIZE_T</CODE>. (Ex. if <CODE>MSS_PTR_SIZE_T</CODE> is defined to <CODE>unsigned long</CODE> this option should be defined to <CODE>&quot;%lu&quot;</CODE></TD></TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_FUNCTION_MACRO</CODE></TD>
+<TD BGCOLOR="#C0C0FF">This option <I>must</I> be defined. It should be defined to a predefined macro, 
+or a string variable provided by your compiler that represents the name of the function in which it
+was found. (Set it to a string constant in case your compiler doesn't provide such a macro, ex. &quot;unknown&quot;).
+(GNU C Uses <CODE>__PRETTY_FUNCTION__</CODE> or <CODE>__FUNCTION__</CODE>), and by default it is defined to <CODE>__PRETTY_FUNCTION__</CODE>. 
+Borland users need to change this to "(unknown function)" or "?" or something, since Borland does not supply such 
+a function macro.</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_DEFINE_NEW_DELETE_ARRAY</CODE></TD>
+<TD BGCOLOR="#C0C0FF">Some compiler needs a redefinition of new[] and delete[], some don't (these should be rare nowadays). If your compiler does, define this, otherwise don't (comment it out).  GCC wants this defined, whereas Microsoft Visual C++ 1.5 does not.<BR>
+If you do not know wether or not your compiler wants this defined, try compiling with this option enabled first, and disable it only if it doesn't work.</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_USE_EXCEPTIONS</CODE></TD>
+<TD BGCOLOR="#C0C0FF">This should be defined if your compiler supports exceptions.
+If you get a warning/error about operator delete throwing diffrent
+exceptions (or something like that) try toggeling this, that should help. (GCC 2.8.0 supports
+exceptions and wants this enabled, earlier versions does not.
+(With PGCC-2.90.23 based on EGCS 1.0.1 this should be defined).
+Anyway, if you get the errors above, try undefining this if defined, and
+defining it if undefined. (If you're not compiling with C++ support, you don't need to worry about this).</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_DTOR_AFTER_ATEXIT</CODE></TD>
+<TD BGCOLOR="#C0C0FF">This option should be defined in case your compiler will run
+the destructors of global objects <I>after</I> any functions registered with the
+atexit() function. It is not essential that this setting is correct for MSS to work, but it will make the logfile look nicer.  If your compiler is advanced enough to follow the C++ standard that says that any &quot;exit functions&quot;, including <EM>both</EM> destructors of global objects <EM>and</EM> functions registered with atexit should be called in the reverse order that they were registered, i.e. they will be mixed. In that case you will just have to test by toggling this option and see what gives the nicest looking result. Remember, whatever setting you choose for this option, it will <EM>never</EM> lead to a sever error or crash.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><CODE>MSS_DISABLE_THREADING_FUNC<BR>
+MSS_ENABLE_THREADING_FUNC</CODE></TD>
+<TD BGCOLOR="#C0C0FF">These options <EM>must</EM> be defined. They are useful in multithreading environments. They should point to a function disabling respectively enabling threading. This is not a very good solution, and it is likely to change in the future, but at present it's all there is to make the program threading safe. These are defined to nothing by default.</TD>
+</TR>
+</TABLE>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="compiling-and-installing-mss-using-gcc"><B>
+2.3 Compiling and installing MSS using GCC
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>
+Since MSS was developed using GCC, and comes with a makefile for GCC, this should not be any problems, unless you use a really old version of GCC. You might however need to configure MSS before compiling, changing one of the <A HREF="#configuring-mss-for-your-compiler">compiler-specific options</A>. </P>
+<P>
+<STRONG>NOTE!</STRONG> If you have GCC but not G++, the GNU C++ compiler, you will want to
+uncomment the 'NOCPP=.' line in the makefile (Remove the '#' sign in front of that line).  If you have C++ support
+however, do not uncomment that line, even if you are only going to use the library
+in plain C projects.</P>
+
+<P>Enter the MSS directory, and enter 'make all'.  This should compile
+everything, making the library and test programs.</P>
+
+<P>If you want to install the package to its default locations which are:
+<UL>
+<LI>DJGPP: Headerfiles go into %DJDIR%/include, the library goes into %DJDIR%/lib.</LI>
+<LI>LINUX: Headerfiles go into /usr/local/include, the library goes into
+/usr/local/lib</LI>
+</UL>
+just enter 'make install'.  If you want to install MSS to another location,
+edit the makefile and change the <CODE>LIBDEST</CODE> and <CODE>INCLUDEDIR</CODE> parameters under
+the correct section.</P>
+
+<A NAME="streambuf.h">
+<P>If you are using G++ 2.95.x, you have to replace header file &lt;streambuf.h&gt;
+because of <A HREF="#known-problems">this problem</A>. Just copy 
+%DJDIR%/contrib/mss/streambuf.h to %DJDIR%/lang/cxx/streambuf.h.</P>
+
+<P>There are a few more rules in this makefile, of which all are listed here.</P>
+
+<UL>
+<LI>
+<CODE>make all</CODE><BR>
+This will compile everything both the library and the sample programs.
+The library will be placed in lib/[linux|djgpp]/libmss.a, and the
+sample-programs are located in the samples directory. 
+</LI>
+</UL>
+
+<UL><LI>
+<CODE>make lib</CODE><BR>
+This will compile the library only.
+</LI>
+</UL>
+
+<UL><LI>
+<CODE>make test</CODE><BR>
+This will compile the test programs, and the library if it is not present.
+(Same as make all)
+</LI>
+</UL>
+
+<UL><LI>
+<CODE>make install</CODE><BR>
+This will install the library to /usr/local/lib/libmss.a under linux, or
+%DJDIR%/lib/libmss.a under DJGPP, and the headerfile (`mss.h&acute;) will go in
+/usr/local/include under linux, and %DJDIR%/include under DJGPP.
+You can change LIBDEST and INCLUDEDIR in the makefile (under either the DJGPP or
+linux section) if you want these files installed to another place, or copy them manually.
+</LI>
+</UL>
+
+<UL><LI>
+<CODE>make clean</CODE><BR>
+This will remove all objectfiles for the specific environment, i.e.
+if `make clean' is run under Linux it won't remove the DJGPP object
+files, and vice versa.
+</LI>
+</UL>
+
+<UL><LI>
+<CODE>make cleanall</CODE><BR>
+This will remove all rebuildable files, excluding any installed ones.
+</LI>
+</UL>
+
+<UL><LI>
+<CODE>make uninstall</CODE><BR>
+This will uninstall any installed files, i.e. remove them.
+</LI>
+</UL>
+
+</UL>
+
+<P>MSS comes with a few documented sample programs that will show you some of MSS's capabilities and how you might use MSS to locate bugs. These files are located in the samples directory. See the file <CODE>README</CODE> in that directory for more information.</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="compiling-and-installing-mss-using-borland"><B>
+2.4 Compiling and installing MSS using Borland C++ 5.02
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>The directory MSS was installed to is further called the MSS root directory.
+Locate <CODE>mss.h</CODE> in the MSS root directory and open it. Comment out the definition
+of <CODE>MSS_FUNCTION_MACRO</CODE> and replace it by <CODE>#define MSS_FUNCTION_MACRO "(unknown function)"</CODE>.</P>
+
+<P><FONT SIZE="+1">Targets in the project file</FONT></P>
+<P>Now open <CODE>borland.ide</CODE> in your IDE. You will notice eight target nodes plus one
+source pool node:</P>
+
+<P><TABLE BORDER="1">
+<TR><TD><CODE>mss32.lib</CODE></TD>
+<TD>MSS library, no debugging code</TD></TR>
+<TR><TD><CODE>mss32MT.lib</CODE></TD>
+<TD>MSS library, no debugging code, multithreaded*</TD></TR>
+<TR><TD><CODE>mss32debug.lib</CODE></TD>
+<TD>MSS library, with debugging code</TD></TR>
+<TR><TD><CODE>mss32MTdebug.lib&nbsp;&nbsp;</CODE></TD>
+<TD>MSS library, with debugging code, multithreaded*</TD></TR>
+</TABLE>
+</P>
+
+<P><TABLE BORDER="1">
+<TR><TD><CODE>test1_1.exe&nbsp;&nbsp;</CODE></TD>
+<TD>MSS test program as included in the MSS relase</TD></TR>
+<TR><TD><CODE>test1_2.exe</CODE></TD>
+<TD>MSS test program as included in the MSS relase</TD></TR>
+<TR><TD><CODE>test1_3.exe</CODE></TD>
+<TD>MSS test program as included in the MSS relase</TD></TR>
+<TR><TD><CODE>test2_1.exe</CODE></TD>
+<TD>MSS test program as included in the MSS relase</TD></TR>
+</TABLE></P>
+
+<P><TABLE BORDER="1">
+<TR><TD><CODE>MSSSources&nbsp;</CODE></TD>
+<TD>source pool referenced by all lib targets</TD></TR>
+</TABLE></P>
+
+<P>All test programs get linked with mss32.lib. I have tested mss32debug.lib, too,
+but none of the multithreaded libs. Also, I haven't tried to build 16-Bit libs,
+just in case you might wonder.</P>
+
+<P>* Please note that you have to modify <CODE>mss.h</CODE> to deal with multithreading. See the
+<A HREF="#configuring-mss-for-your-compiler">details on MSS_DISABLE_THREADING_FUNC and
+MSS_ENABLE_THREADING_FUNC</A>. Without that modification, the multithreaded
+libraries might not work.</P>
+
+<P><FONT SIZE="+1">Configuring the project file</FONT></P>
+
+<P>Under "Options | Project | Directories" adjust the "Include" and "Library" directories so that they match your
+environment. If you have set an environment variable BCROOT to contain the root
+directory of your environment, then you don't need to make any modifications.
+Otherwise you have to replace each occurence of $env(bcroot) by that root
+directory, e.g. c:\bc5.</P>
+
+<P><FONT SIZE="+1">Compiling</FONT></P>
+
+<P>In the MSS root directory, you will have found two subdirectories "lib" and
+"objs". Each of these directories contain a directory named "borland".
+These subdirectories will contain the *.obj and *.lib files. (Should you ever
+want to change these locations, be sure to adjust the "Intermediate" and "Final"
+directories under Options | Project | Directories accordingly).</P>
+
+<P>Now run "Project | Build all" to compile all libraries and test programs. Please note that all object files
+are written into the same directory, so just running "Project | Make all" would produce corrupt libraries.</P>
+
+<P>After that, all *.lib files can be found in the "lib\borland" subdirectory. All
+test executables can be found in the "samples" subdirectory.</P>
+
+<P>If you have trouble compiling MSS under Borland C++ v5.02, please feel free to
+mail me under rfkat@ibm.net. However, please direct questions directly pertaining to MSS to 
+<A HREF="mailto:blizzar@hem1.passagen.se">Peter Palotas at blizzar@hem1.passagen.se</A>.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="compiling-and-installing-mss-using-other-compiler"><B>
+2.5 Compiling and installing MSS using another compiler
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+
+<P>If you are using another compiler, you will have to write your own makefile or compile the library manually. The library should consist of the following files:</P>
+<UL>
+<LI><CODE>alloc.c</CODE></LI>
+<LI><CODE>check.c</CODE></LI>
+<LI><CODE>cppspec.cc (only if your compiler supports C++)</CODE></LI>
+<LI><CODE>list.c</CODE></LI>
+<LI><CODE>inifile.c</CODE></LI>
+<LI><CODE>config.c</CODE></LI>
+<LI><CODE>init.c</CODE></LI>
+<LI><CODE>internal.c</CODE></LI>
+<LI><CODE>log.c</CODE></LI>
+<LI><CODE>inifile.c</CODE></LI>
+<LI><CODE>user.c</CODE></LI>
+</UL>
+
+<P>You might have to rename the <CODE>.cc</CODE> files to <CODE>.cpp</CODE> for some compilers. (Probably for most DOS based ones).</P>
+
+<P>After compiling these files and generating the library, the library and the include file `<CODE>mss.h</CODE>&acute; has to be copied to somewhere where your compiler will find them. Read the manual for your specific compiler.</P>
+
+<P>MSS comes with a few documented sample programs that will show you some of MSS's capabilities and how you might use MSS to locate bugs. These files are located in the samples directory. See the file <CODE>README</CODE> in that directory for more information.</P>
+
+<HR>
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="using-mss"><B>3. Using MSS</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#how-to-make-your-program-use-mss">3.1 How to make your program use MSS</A><BR>
+<A HREF="#functions-provided-by-mss">3.2 Functions provided by MSS</A><BR>
+<A HREF="#what-do-these-warnings-mean">3.3 What do these warnings in the logfile mean?</A><BR>
+<A HREF="#hints-and-tips">3.4 Hints &amp; Tips</A><BR>
+<A HREF="#known-problems">3.5 Known Problems With MSS</A><BR>
+</UL>
+</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="how-to-make-your-program-use-mss"><B>
+3.1 How to make your program use MSS
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>Making your program use MSS is as we have mentioned earlier really simple. All you have to do is to add `<CODE>#include &lt;mss.h&gt;</CODE>&acute; at the very top of every C/C++ source file in your project. Note that you have to add this line to <I>all</I> files in your project, or MSS will not work correctly. To actually enable MSS you will also have to define the symbol <CODE>MSS</CODE>, and link your program with the MSS library.</P>
+
+<P>If you are using GCC, you can simply define the <CODE>MSS</CODE> symbol by specifying <CODE>-DMSS</CODE> on the commandline to gcc, and specify <CODE>-lmss</CODE> to link with the MSS library. To achieve best performance, you should specify the MSS library as the very last library on the commandline. This is because MSS wants to know when your program exits, and if you don't specify MSS as the last library, it might think your program exits before it really does, due to the way destructors are called. (This does not affect C projects though, nor will it cause any errors or anything, it will just print that the program exits before it really does to the log file, hence making it look like some allocations/deallocations occured after the program exit. This is extremely rare though, and you normally don't have to worry about this).</P>
+
+<P>Every call to '<CODE>new</CODE>', '<CODE>delete</CODE>', '<CODE>malloc</CODE>', '<CODE>calloc</CODE>', '<CODE>realloc</CODE>', '<CODE>xmalloc</CODE>', '<CODE>xrealloc</CODE>', '<CODE>cfree</CODE>', '<CODE>xfree</CODE>', '<CODE>free</CODE>' and '<CODE>strdup</CODE>' will be filtered and processed by MSS, and a logfile will be
+created. (Or logging will be written to stdout/stderr, depending on your configuration). You might notice a minor(?) speed
+degradation when running your program using MSS (sometimes, depending on how MSS is configured, the speed degradation can be very big, which might make you think the program has crashed), otherwise you shouldn't notice anything diffrent about your program. (Other than the fact that you probably will get fewer crashes). The logfile created will contain information about all allocated memory, when the allocations/deallocatios occured, if any errors has been detected and so on. Depending on the configuration options to MSS the logfile can sometimes become very large, so be aware of this so that you have enough free diskspace.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="functions-provided-by-mss"><B>
+3.2 Functions provided by MSS
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>
+MSS provides a lot of functions that your program might call to get information about the current memory situation, or affect the logging in some way which is what most of the functions do. All functions are called through macros, which all compiles away to nothing in case the preprocessor symbol '<CODE>MSS</CODE>' was not defined. This feature makes it easy to switch between &quot;debug&quot; and &quot;release&quot; mode, in case you want to for an example test the real speed with which your program will run this comes quite in handy.</P>
+
+<P>For a complete reference of all the functions, see the <A HREF="#function-reference">Function Reference</A>.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="what-do-these-warnings-mean"><B>
+3.3 What do those warnings in the logfile really mean?
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>The MSS logfile sometimes produces warnings which may seem strange at first, therefore we have decided to explain the meaning of some terms here.</P>
+
+<TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>Prefix Corrupted</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">You have written some data out of the limits of the described block. Specifically, you've done it <I>before</I> the start of the
+block. This is mainly caused by using 'signed' numbers as array indexes or pointer displacements on some pointer arithmetic, so
+you end up using negative indexes or displacements.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>Suffix Corrupted</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">You have written some data out of the limits of the described block. Specifically, you've done it <I>after</I> the end of the block. This is typically caused by array operations contained in loops that go 'too far'. Can also be caused by using a too small buffer to hold some data.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>Trying to delete a non-allocated block</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">There is no block allocated at the address that pointer points to. The main reasons for this are: 
+<UL>
+<LI>You have really not allocated any block for that pointer. </LI>
+<LI>You did, but somehow the pointer has been altered and it's original value lost (maybe you where using it as an index?). </LI>
+<LI>The pointer was correctly pointing to a block of allocated memory, but you have deallocated it before; that is, you are
+deallocating it twice or more! To see if this is what happened, look for the same pointer value in the log file and see what you did to it.</LI>
+</UL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>There is no block starting at 'address'</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">Same as above. This is issued when you request some info about a non existent block.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>Zero length allocation</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">You are requesting an allocation for a zero length block. Maybe some uninitialized variable or a logic or flow bug is causing this problem!?</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>NULL pointer deallocation</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">You are deleting a pointer to NULL. This will probably result in a GP Fault, however it is actually legal in C++ (using delete) a
+warning will still be printed, since you shouldn't do this. Some compilers may not like it! (This warning can be disabled for C++ though, but is normally enabled).</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><STRONG>Pointer 'p' does not point to any valid memory</STRONG></TD>
+<TD BGCOLOR="#C0C0FF">You are dealing with a pointer that does not point to any legal allocated memory. MSS should tell you also what are the nearest
+legal blocks. You've probably stepped out from any of them. You may also be using an uninitialized pointer.</TD>
+</TR>
+</TABLE>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="hints-and-tips"><B>
+3.4 Hints &amp; Tips
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>Here are some notes that you may find useful:
+
+<UL>
+<LI>First time users of MSS, please study the sample programs in the samples directory and their documentations. This is really useful for learning some of MSS's capabilities and how you might use it to debug your programs. See the file '<CODE>README</CODE>' in the <CODE>samples</CODE> directory for more information.
+</LI>
+</UL>
+
+<UL>
+<LI>
+Keep in mind that all the values that MSS gives you (total memory used, blocks, etc...) ignore MSS own use of memory. That is, MSS is completely transparent to itself, so you can rely on this values being accurate. But notice that the <EM>real</EM> use of memory when using MSS is always higher due to it's own memory needs. They are not much, anyway; about 20-30 bytes by memory allocation proccessed. This is increased in WatchSize * 2 if WatchLimits is enabled. 
+</LI>
+</UL>
+
+<UL><LI>
+Be careful about disk space and logging options. An MSS log file with all options enabled can be really *big*, specially on big &amp; memory intensive programs. In a game I am writing (about 4000+ lines of code), I get a 900kb log file! Use MSS even if your program runs without problems and you think it has no bugs. It is *incredible* the amount of memory related bugs that can be hidind behind an apparent correct program. I did this with my game, which was giving no problems, and found *TONS* of bugs, some little, some really nasty. I also found a BIG memory leak... (in fact, I was frightened after reading the log file!).
+</LI>
+</UL>
+
+<UL><LI>
+Always remember what options where enabled when reading a log file. They are listed at the beginning of it. You may think you have no 'out of range write' bugs, while the reality is that MSS was not checking them! Note that 'out of range' write check is only done if you specifically invoke it at run time (with <CODE>MSS_CHECK_ALL_BLOCKS</CODE> or <CODE>MSS_CHECK_BLOCK_AT()</CODE>) or if <CODE>CheckOnDealloc</CODE> or <CODE>CheckAllOnAlloc</CODE> is enabled at compile time. 
+</LI>
+</UL>
+
+<UL><LI>
+If you only want to discover hidden bugs, put <CODE>MSS_DISABLE_LOG_OUTPUT</CODE> at the beginning of your program. This will make MSS log only the warnings, and not every legal memory operation. Anyway, it is a good practice to inspect at least once the 'memory allocation trace' generated by MSS by default. If you get a warning about trying to delete a non allocated block, enable <CODE>FillMemOnAlloc</CODE> and take a look at the direction of the offending pointer; if it is equal to <CODE>FillMemOnAllocValue</CODE>, then you are deleting a dynamically allocated uninitialized pointer. 0x98 is the default <CODE>FillMemOnAllocValue</CODE>. 
+</LI>
+</UL>
+
+<UL><LI>
+If your program crashes, look at the MSS logfile to see where the last memory operation was executed. This may give
+you a hint to isolate the bug. It is useful to write little testing programs that create one object and then destroys it. You can use MSS to check if all memory has been deallocated successfully, or if it is still some memory reserved. This is specially useful to check the destructors of complex classes that do a lot of dynamic allocations/deallocations. An example: <BR>&nbsp;
+
+<TABLE CELLSPACING="2" CELLPADDING="4" BORDER="0">
+<TR><TD BGCOLOR="#FFFFC0">
+<PRE>
+#include &quot;ctree.h&quot;    //For complex tree class
+#include &quot;mss.h&quot; //For MSS :)
+
+int main(void)
+{
+        Ctree * my_tree= new Ctree; //I create a complex tree
+        <...Do a lot of operations of node insertion...>
+        MSS_LOG_INFO;       //To see number of blocks and memory used.
+        delete my_tree; //Destroy the tree -> call destructor -> release memory
+        MSS_LOG_INFO;       //To see if there is still any allocated memory.
+        MSS_LOG_BLOCK_LIST; //To get detailed info about it.
+        return 0;
+}
+</PRE>
+</TD></TR></TABLE>
+</LI>
+</UL>
+
+<UL><LI>
+Remember, you must put the <CODE>#include &lt;mss.h&gt;</CODE> in ALL your <I>C</I> files to fully use MSS, or if you want to stop using MSS, you can either delete all <CODE>#include &lt;mss.h&gt;</CODE>, or not define 'MSS'. You also must <EM>not</EM> link the MSS library to your project. (If you are using only plain <I>C</I>, no <I>C++</I>, you can still link the library if you want to, making it very easy to disable MSS. Simply don't define '<CODE>MSS</CODE>'). If you forget putting <CODE>#include &lt;mss.h&gt;</CODE>in any of your project's <I>C++</I> files, MSS will <EM>not</EM> be able to get detailed info about memory allocations or deallocations (I mean line number, module name and function name), but it will still handle all loggings correctly. This loggings will appear as:  &quot;<CODE>LOG: unknown (line 0 of unknown) allocated 20 bytes at 51120.</CODE>&quot;.<BR>
+The same applies to precompiled modules linked with your application. However, this does not apply to <I>C</I> files. If you forget to include `<CODE>mss.h</CODE>&acute; in your <I>C</I> files MSS will not intercept and detect any allocations/deallocations. 
+</LI>
+</UL>
+
+<UL>
+<LI>
+Please, if you use MSS, <A HREF="#contacting-the-authors">mail us and tell us</A>. We'd really like to hear from you! Any comments, suggestions, etc... are
+highly appreciated. Thanks :). 
+</LI>
+</UL>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="known-problems"><B>
+3.5 Known problems with MSS
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>Currently there is only a single serious known problem with MSS. If your 
+program overloads the <CODE>operator new</CODE> your program will not work 
+correctly with MSS. For example, this happens with libstdc++ from GCC 2.95.
+(Look for workaround <A HREF="#streambuf.h">here</A>. Also if you make your 
+own <CODE>#define free &lt;something&gt;</CODE> or any other allocation 
+function MSS will not work. Currently we have no good solution to these 
+problem, but there is a workaround available: insert #include &lt;no_mss.h&gt; 
+before any problematic place and re-include &lt;mss.h&gt; afterwards. 
+
+<HR>
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="configuring-mss"><B>4. Configuring MSS</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#general-information">4.1 General information</A><BR>
+<A HREF="#configuration-file-syntax">4.2 Configuration file syntax</A><BR>
+<A HREF="#specifying-where-to-write-logging-output">4.3 Specifying where to write logging output</A><BR>
+<A HREF="#options-concerning-error-detection">4.4 Options concerning error detection</A><BR>
+<A HREF="#options-concerning-the-layout-of-the-logfile">4.5 Options concerning the layout of the logfile</A><BR>
+</UL>
+</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="general-information"><B>
+4.1 General information.
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>This chapter discusses the configuration which affects MSS while it is running, which mostly includes what kind of error checking to perform, and the layout of the logfile.</P>
+
+<P>All compiler specific configurations should be made either in the makefile (if you are using GCC) as discussed in <A HREF="#compiling-and-installing-mss-using-gcc">Compiling and installing MSS using GCC</A>, or in `mss.h&acute; which is discussed in <A HREF="#configuring-mss-for-your-compiler">Configuring MSS for your compiler</A>.</P>
+
+<P>All run-time specific configurations are either read from special configuration files at run-time, or the internal hard-coded values are used. The special configuration files does not need to contain <EM>all</EM> available configuration options, only the ones that it should override. The configuration is made in the following order;
+</P>
+<UL>
+<LI>Internal hard-coded values are &quot;read&quot;.</LI>
+<LI>Global configuration file (if present) is read, overriding the hard-coded values.</LI>
+<LI>Local configuration file (if present) is read, overriding any previous read values.</LI>
+</UL>
+<P>There is no need to have any configuration file present, and in that case the hard-coded values are used. If you wish to use a <EM>global</EM> configuration file, this file will be read by any program that uses MSS, the environment variable `<CODE>MSS_CFG</CODE>&acute; should contain the full path to this file. The option `<CODE>LocalCFGFile</CODE>&acute; in this file specifies the name of the local configuration file (if this option is not available the hard-coded value `<CODE>mss.cfg</CODE>&acute; will be used. The <EM>local</EM> configuration file is always expected to be found in the directory from which the program is run (<B>NOTE</B> that your program must not change directories before the first call to an MSS function or a memory allocation function if the local configuration file should be found). If this files exists, any options available in it will override the options previously read from any global configuration file or the hard-coded values.</P>
+<P>Please note that you do not need to have both configuration files present. You can choose only to have the <EM>local</EM> or the <EM>global</EM> file or none of them. It is however recommended that you create a global configuration file, so that you are sure on which options are enabled.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="configuration-file-syntax"><B>
+4.2 Configuration file syntax
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>The syntax of the configuration files is really simple, and is very similar to for an example the windows ini files except there are no sections.  The purpose of the configuration files are to set various options to diffrent values.  The general syntax is:</P>
+<P><CODE>&lt;OptionName&gt; = [&quot;]&lt;Value&gt;[&quot;]</CODE></P>
+Where <CODE>&lt;OptionName&gt;</CODE> is the name of the option, and <CODE>&lt;Value&gt;</CODE> is the value you wish to set this option to. The value can be quoted if you wish to, but this is not neccessary unless you want to include whitespaces at the beginning or the end of the value. There are some values that have a special meaning if a boolean (true/false) value it expected. You can set a boolean option to either &quot;True&quot;, &quot;1&quot; or &quot;Yes&quot; to specify a <EM>true</EM> value, or &quot;False&quot;, &quot;0&quot; or &quot;No&quot; to specify a <EM>false</EM> value. Note that all <EM>integer</EM> values can be specified in decimal <EM>or</EM> hexadecimal form (ex. <CODE>0x10</CODE>). If you want the option to include a quote (&quot;), a newline or some other special character you need to escape it. The following escape codes are recognized by MSS:</P>
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR VALIGN="top">
+<TD BGCOLOR="#FFC0C0"><B>Escape Sequence</B></TD>
+<TD BGCOLOR="#FFC0C0"><B>Meaning</B></TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#C0C0FF"><CODE>\\</CODE></TD>
+<TD BGCOLOR="#C0C0FF">Single backslash</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#C0C0FF"><CODE>\n</CODE></TD>
+<TD BGCOLOR="#C0C0FF">Newline</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#C0C0FF"><CODE>\r</CODE></TD>
+<TD BGCOLOR="#C0C0FF">Carriage Return</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#C0C0FF"><CODE>\&quot;</CODE></TD>
+<TD BGCOLOR="#C0C0FF">Double Quote</TD>
+</TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#C0C0FF"><CODE>\t</CODE></TD>
+<TD BGCOLOR="#C0C0FF">Tab</TD>
+</TR>
+</TABLE>
+</P>
+<P>Comments are also allowed in the config file, on an empty line. They should be preceeded by a <CODE>#</CODE>-sign.</P>
+<P>Let's show you an example:</P>
+
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR BGCOLOR="#FFFFC0">
+<TD>
+<PRE>
+# This is a comment
+LogFileName = &quot;mss.cfg&quot;
+
+# False and No have the same meaning.
+LogToStdout = False
+LogToStderr = No
+
+NewLineString = &quot;\n&quot;
+</PRE>
+</TD></TR></TABLE></P>
+<P><B>NOTE!</B> The configuration files are case-insensitive, that is &quot;LogFileName&quot; is equal to &quot;LOGFILENAME&quot; and &quot;logfilename&quot;.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="specifying-where-to-write-logging-output"><B>
+4.3 Specifying where to write log output
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+</FONT></A></H2>
+<P>Logging output can be written either to a file, or any of the standard output streams (stdout and stderr). This is controlled by the three configuration options `<CODE>LogFileName</CODE>&acute;, `<CODE>LogToStdout</CODE>&acute; and `<CODE>LogToStderr</CODE>&acute;.</P>
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR VALIGN="bottom" BGCOLOR="#FFC0C0">
+<TD><B>Option Name</B></TD>
+<TD><B>Type</B></TD>
+<TD><B>Description</B></TD>
+<TD><B>Default</B></TD>
+</TR>
+
+<TR VALIGN="top"  BGCOLOR="#C0C0FF">
+<TD><CODE>LogFileName</CODE></TD>
+<TD>String</TD>
+<TD>The filename to which logging output will be written in case both `<CODE>LogToStdout</CODE>&acute; and `<CODE>LogToStderr</CODE>&acute; are set to false. They are described below</TD>
+<TD><CODE>mss.cfg</CODE></TD>
+</TR>
+
+<TR VALIGN="top"  BGCOLOR="#C0C0FF">
+<TD><CODE>LogToStdout</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this is set to true logging output will be written to the standard output (stdout). Note that only one of `<CODE>LogToStdout</CODE>&acute; and `<CODE>LogToStderr</CODE>&acute; may be set to true at the same time, so always include both of these in the configuration file.</TD>
+<TD><CODE>False</CODE></TD>
+</TR>
+
+<TR VALIGN="top"  BGCOLOR="#C0C0FF">
+<TD><CODE>LogToStderr</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this is set to true logging output will be written to the standard error (stderr). Note that only one of `<CODE>LogToStdout</CODE>&acute; and `<CODE>LogToStderr</CODE>&acute; may be set to true at the same time, so always include both of these in the configuration file.</TD>
+<TD><CODE>False</CODE></TD>
+</TR>
+</TABLE>
+</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="options-concerning-error-detection"><B>
+4.4 Options concerning error detection
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+
+<P>There are a number of options that lets you specify diffrent methods which will either make MSS detect errors, or somehow make it easier for the programmer to detect them. They are listed below:</P>
+
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR VALIGN="top" BGCOLOR="#FFC0C0">
+<TD><B>Option Name</B></TD>
+<TD><B>Type</B></TD>
+<TD><B>Description</B></TD>
+<TD><B>Default</B></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>WatchLimits</CODE></TD>
+<TD>Boolean</TD>
+<TD>This option enables/disables the checking of out-of-bounds writes on dynamically allocated memory blocks. This is achieved by allocating some extra space on both sides of the memory block, and filling it with a specific value. Then upon deallocation of the block, or upon request from user, this extra space is checked. If it doesn't all contain the same value it was filled with then an out-of-bound writing has occured. It is recommended to have this option enabled. Although it wastes some memory, it is one of the most powerful features in detecting bugs.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>WatchSize</CODE></TD>
+<TD>Integer</TD>
+<TD>This option specifies the size of the extra space allocated before and after any allocated blocks, if `<CODE>WatchLimits</CODE>&acute; was set to true. Bigger  values give more detection power, but also more waste of memory and the time spent checking blocks will increase.</TD>
+<TD><CODE>32</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>WatchValue</CODE></TD>
+<TD>Integer  (0-255)</TD>
+<TD>This option specifies the value with which the extra space allocated before and after any allocated blocks if `<CODE>WatchLimits</CODE>&acute; was set to true. Set this to anything but zero.</TD>
+<TD><CODE>0xA8</CODE></TD>
+</TR>
+
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>FillMemOnAlloc</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is set to true, all memory allocated will be filled with a specific value (specified by `<CODE>FillMemOnAllocValue</CODE>&acute;). This is useful, since programmers often accidently rely upon uninitialized memory, which usually will be zero, but with this option enabled it will all be initialized to `<CODE>FillMemOnAllocValue</CODE>&acute;</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>FillMemOnAllocValue</CODE></TD>
+<TD>Integer (0-255)</TD>
+<TD>This option specifies the `byte&acute; value with which to fill memory upon allocation. (see `<CODE>FillMemOnAlloc</CODE>&acute;)</TD>
+<TD><CODE>0x98</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>FillMemOnDealloc</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is enabled all memory will be filled with a specific value (specified by `<CODE>FillMemOnDeallocValue</CODE>&acute; upon deallocation. This is useful, since programs often use memory after it has been deallocated (it even happened during the development of MSS, but we had a much harder time detecting it than you will have with this option enabled), and with this option
+enabled those bugs will be easy to detect.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>FillMemOnDeallocValue</CODE></TD>
+<TD>Integer (0-255)</TD>
+<TD>This option specifies the value with which to fill deallocated memory with. (see `<CODE>FillMemOnDealloc</CODE>&acute;).</TD>
+<TD><CODE>0x86</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>CheckOnDealloc</CODE></TD>
+<TD>Boolean</TD>
+<TD>With this option enabled all blocks will be checked for out-of-bound writings and constant block corruption as they are deallocated. It is <EM>strongly</EM>recommended that you leave this enabled, since all blocks really should be checked upon deletion.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>CheckAllOnAlloc</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is set to true <EM><B>all</B></EM> blocks will be checked for out-of-bound writing and constant block corruptions <EM>every</EM> time a block is allocated/deallocated. This can be <EM>very</EM> time-consuming, and is usually not neccessary.</TD>
+<TD><CODE>False</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>AllocFails</CODE></TD>
+<TD>Integer (0-100)</TD>
+<TD>This option should be a number between 0 and 100, which indicates how many percent of the times that malloc are called will fail, hence returning NULL. This is useful for stress-testing you application, to see if it can deal with out-of-memory situations. If this is set to ex. 50, malloc/calloc/realloc will return NULL about every second time it was called (average), even though they did not actually run out of memory. Set to zero to disable.</TD>
+<TD><CODE>0</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>ExitOnWarning</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is enabled, MSS will exit the program as soon as a warning is written to the logfile. This option is disabled by default, but if your program crashes, and the logfile somehow disappears it might be useful to enable this option.</TD>
+<TD><CODE>False</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>WarnOnAllNULLDeallocs</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is set to true, MSS will always warn you when trying to deallocate a NULL-pointer using the The reason this warning can be disabled, is because it is <EM>legal</EM> to deallocate a NULL-pointer according to the ANSI C/C++ standard. However, some compilers do not like this, and crash if you try to deallocate a NULL-pointer, so it's always good practice to check for NULL-pointers before deallocating memory.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>ZeroLenAllocReturnNULL</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is set to true, MSS will always return NULL if the user program tries to allocate a block sized zero bytes, rather than passing the request to the standard library allocation function. It is recommended to have this option enabled, and it is by default.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+</TABLE>
+</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="options-concerning-the-layout-of-the-logfile"><B>
+4.5 Options concerning the layout of the logfile
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>There are also a couple of options that controls the layout of the logfile, they are listed here.</P>
+
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR VALIGN="top" BGCOLOR="#FFC0C0">
+<TD><B>Option Name</B></TD>
+<TD><B>Type</B></TD>
+<TD><B>Description</B></TD>
+<TD><B>Default</B></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>ShowLogs</CODE></TD>
+<TD>Boolean</TD>
+<TD>With this option enabled all normal log messages (successful operations) will be written to the logfile, if it's disabled no normal log messages will be written to the logfile. (This can be overridden by function calls, see the <A HREF="#function-reference">Function Reference</A>).</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>ExtraNewline</CODE></TD>
+<TD>Boolean</TD>
+<TD>If this option is enabled, there will be an extra newline written to the logfile, between each log/warning message. This will make the logfile more readable.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>WordWrap</CODE></TD>
+<TD>Boolean</TD>
+<TD>This option defines wether or not the logfile should be word-wrapped.</TD>
+<TD><CODE>True</CODE></TD>
+</TR>
+</TABLE>
+</P>
+<HR>
+
+
+
+
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="function-reference"><B>5. Function Reference</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#general-function-information">5.1 General information</A><BR>
+<A HREF="#reference-function">5.2 Reference</A><BR>
+</UL>
+</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="general-function-information"><B>
+5.1 General information
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>MSS provides a number of functions, that either controls the behaviour of MSS or outputs some information to the logfile. All calls are made through macros, and all of these macros expand to nothing if the symbol `<CODE>MSS</CODE>&acute; was not defined, which is useful for switching between &quot;debug&quot; and &quot;release&quot; mode when compiling your program. (Don't forget not to link the mss library with your program if you are using C++ and want to test a &quot;release&quot; version of your program).</P>
+
+<P>Note that the MSS macros should not have any parenthesis after them in case the function takes no arguments. See this example:</P>
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR BGCOLOR="#FFFFC0"><TD>
+<PRE>
+char *ptr = new char[10];
+strcpy(ptr, &quot;Hello&quot;);
+MSS_DISABLE_LOG_OUTPUT;
+MSS_REGISTER_CONSTANT_BLOCK(ptr);
+MSS_ENABLE_LOG_OUTPUT;
+...
+</PRE>
+</TD></TR></TABLE></P>
+<P>As you see the `<CODE>MSS_DISABLE_LOG_OUTPUT</CODE>&acute; macro is called <EM>without</EM> any trailing empty parenthesis ().</P>
+     
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="reference-function"><B>
+5.2 Reference
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+
+<P>This is the MSS function reference. (Actually macro reference, but all macros call functions so...)</P>
+
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<CAPTION ALIGN="top"><B>Functions macros that returns nothing and prints all output to the logfile<B></CAPTION>
+<TR VALIGN="top" BGCOLOR="#FFC0C0">
+<TD><B>Function name</B></TD>
+<TD><B>Description</B></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_LOG_INFO</CODE></TD>
+<TD><P>This command writes general info about the present memory state to the logfile. The info written is:</P>
+<UL>
+<LI>The number of blocks currently allocated</LI>
+<LI>The amount of memory currently used</LI>
+<LI>The maximum amount of memory used since program start</LI>
+<LI>The number of calls to allocation/deallocation functions.</LI>
+<LI>The number of successful allocations/deallocations.</LI>
+</UL>
+<P>Please note that all memory references done by MSS are about dynamically allocated memory, MSS does not proccess static or automatic memory usage.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_LOG_INTERNAL_INFO</CODE></TD>
+<TD><P>This command lists some information about how much memory MSS actually uses, how much memory is wasted by the `<CODE>WatchLimits</CODE>&acute; option and so on, to the logfile. It is not really useful for program debugging, but it's there in case you want to know anyway.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_LOG_BLOCK_LIST</CODE></TD>
+<TD>This command outputs a list of all currently allocated blocks to the logfile, together with information about where that block was
+allocated, by what function, the size of it and so on. A little warning is probably in place though, the output can be quite long if there is a lot of blocks allocated. (Just look at the test programs).</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_LOG_BLOCK_LIST_FILTERED(func)</CODE></TD>
+<TD>This command iterates through the list of currently allocated blocks, and calls a user-supplied callback function for each block. This allows for selective inspection of block contents or selective block lists. The user-supplied callback function must be of the following type: <CODE>int callback_func(char *out, void *block, unsigned int size, const char *label, const char *file, const char *function, unsigned int line);</CODE> where <CODE>block</CODE> is a pointer to the block, <CODE>size</CODE> is the size of the block, <CODE>label</CODE> is a string containing the label of the block if any has been set, or <CODE>NULL</CODE> otherwise, <CODE>file, function, line</CODE> represents the file, line and function in which the block was allocated. (The function might not be correct if your compiler does not support a FUNCTION macro).<BR>All the output of this function that you want written to the logfile should be written into <CODE>out</CODE> which points to an empty string. (see Sample 2 for an example).<BR>&nbsp;<BR>Exactly what the callback function does is not relevant as long as:<BR>
+<UL>
+<LI>it does not alter the data passed to it (except for <CODE>out</CODE>)</LI>
+<LI>it does not write more than 1023 characters to <CODE>out</CODE></LI>
+</UL>
+</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_CHECK_ALL_BLOCKS</CODE></TD>
+<TD>This command checks <EM>all</EM> allocated blocks for out-of-bound writings and corrupted constant blocks. This command is only effective if MSS was compiled with the WatchLimits option enabled (see <A HREF="#options-concerning-error-detection">Configuring MSS</A>).</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_CHECK_BLOCK_AT(ptr)</CODE></TD>
+<TD>This command checks the specified block starting at `<CODE>ptr</CODE>&acute; for out-of-bound writings and if block was registered at constant also for corruption. This command is only effective if MSS was compiled with the WatchLimits option enabled (see <A HREF="#options-concerning-error-detection">Configuring MSS</A>).</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_CHECK_POINTER_VALIDITY(ptr)</CODE></TD>
+<TD>This command tells you if the specified pointer `<CODE>ptr</CODE>&acute; points to a legal (dynamically allocated) block of memory (not only the start of the block, but anywhere in a block). If not this command will write the nearest block start and block end, and the distance (in bytes) from the pointer to both start and end to the logfile.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_LOG_MSG(str)</CODE></TD>
+<TD>This command simply writes the specified string `<CODE>str</CODE>&acute; to the logfile.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_DISABLE_LOG_OUTPUT<BR>MSS_ENABLE_LOG_OUTPUT</CODE></TD>
+<TD>Disabling <EM>log</EM>-output prevents all <EM><B>legal</B></EM> allocation or deallocation messages to be written to the log file. They are processed by MSS, but silently. Warnings and command outputs are still written anyway.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_LOG_MSG(str)</CODE></TD>
+<TD>This command simply writes the specified string `<CODE>str</CODE>&acute; to the logfile.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_STARTUP</CODE></TD>
+<TD>This command initializes MSS. It is good practice to use this in the very beginning of your program, however not neccessary. If you are registering a function with atexit() before doing any memory allocations though, it is strongly recommended that you put this command <EM>before</EM> the call to atexit.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_SET_BLOCK_LABEL(ptr, str)</CODE></TD>
+<TD>This command will give the block pointed to by `<CODE>ptr</CODE>&acute; the label specified by `<CODE>str</CODE>&acute;. This label will then be written to the logfile whenever a warning/message is written that involves this pointer. This is useful for keeping track of pointers.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_DUMP_BLOCK(ptr, filename)</CODE></TD>
+<TD>This command will generate a raw binary dump of the memory contents pointed to by `<CODE>ptr</CODE>&acute; and write it to the file specified by `<CODE>filename</CODE>&acute;.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_REGISTER_CONSTANT_BLOCK(ptr)<BR>MSS_UNREGISTER_CONSTANT_BLOCK(ptr)</CODE></TD>
+<TD>These commands registers/unregisters the block starting at `<CODE>ptr</CODE>&acute;, as a constant block. When a block is registered as constant it means that the contents of that block may not be changed, and MSS will print a warning if they are, the next time this block is checked. This function uses a very simple checksum method, that simply adds all the bytes in the block together. This is not very bullet proof, but the chance is pretty big that a bug will be detected by this method.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_ENTER_SCOPE<BR>MSS_LEAVE_SCOPE</CODE></TD>
+<TD><P>These commands are useful, if you want to make sure that all blocks that are allocated within a scope are deallocated at the end of that scope. Simply enclose the scope you want to check with `<CODE>MSS_ENTER_SCOPE;</CODE>&acute; at the top and
+`<CODE>MSS_LEAVE_SCOPE;</CODE>&acute; at the end.</P>
+<P>(This function only checks the number of allocated blocks, so it might fail to detect a bug the way you want it, however this should be quite unlikely).</P>
+<P>A warning will be printed at the termination of the program (or what MSS believes is the termination of the program anyway) if
+the number of <CODE>MSS_ENTER_SCOPE</CODE>'s don't match the number of <CODE>MSS_LEAVE_SCOPE</CODE>'s executed.</P></TD>
+</TR>
+</TABLE>
+
+<P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<CAPTION ALIGN="top"><B>Functions macros that returns a value (`<CODE>unsigned int</CODE>&acute;) to the caller and prints nothing to the logfile<B></CAPTION>
+
+<TR VALIGN="top" BGCOLOR="#FFC0C0">
+<TD><B>Function name</B></TD>
+<TD><B>Description</B></TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_CURRENTLY_USED_MEM</CODE></TD>
+<TD>Returns the amount of currently allocated memory, not including the extra memory wasted by MSS internally.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_MAXIMUM_USED_MEM</CODE></TD>
+<TD>Returns the maximum amount of allocated memory since program start, not including the extra memory wasted by MSS internally.</TD>
+</TR>
+
+<TR VALIGN="top" BGCOLOR="#C0C0FF">
+<TD><CODE>MSS_NUMBER_OF_ALLOCATED_BLOCKS</CODE></TD>
+<TD>Returns the number of allocated blocks.</TD>
+</TR>
+</TABLE>
+</P>
+<HR>
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="history"><B>6.History</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#the-birth-of-mss">6.1 The birth of MSS</A><BR>
+<A HREF="#changelog">6.2 Changelog</A><BR>
+<A HREF="#to-do">6.3 To-Do</A><BR>
+</UL>
+</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="the-birth-of-mss"><B>
+6.1 The birth of MSS
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>MSS was born, just like a lot of other programs, as a private tool created by Juanje to check the dynamic memory activities of a game he's writing. The game was growing, and he was feeling a little lost in a forest of allocations/deallocations. At first it was only an overload of the C++ oprators `<CODE>new</CODE>&acute; and `<CODE>delete</CODE>&acute; that counted the amount of memory used. Then, he had the idea of upgrading it and adding some other features. By those days, he found a similar program called FORTIFY. He took a look at it and found it great. But it didn't work for him (why?). So he decided to create MSS and improve it with some of the features found in FORTIFY. He did it in a couple of days. It was August '97.</P>
+
+<P>Then Peter discovered a bug, that MSS didn't detect memory activites that occured before main, like in global object
+constructors. So he sat down and fixed this in a couple of days, but the solution still wasn't good enough he thought, so he
+decided to make a better solution by rewriting the entire MSS in ANSI C. And after he did that he added some more features,
+discovered some more bugs, and modified it all again, and spammed Juanje with e-mails about all the things he had done,
+although he knew Juanje was too busy with his exams to even check his mailbox! After he had done all that, he decided to
+rewrite the documentation, since so many changes were made... It was January '98, and MSS did not look anything like the first betas that Juanje first released.</P>
+
+<P>Finally, Peter and Juanje started working together on MSS, hardtesting it and adding new features, preparing the first real release of MSS, it is February '98.</P>
+
+<P>Then Juanje got too many other things to attend to, to continue the development of MSS. Peter worked for a couple of weeks, but then he too could not work with MSS anymore. So there was version 1.1 lying on Peter's 
+HDD without being released until August '98. Now Peter got a mail from a guy with a question about MSS, and he decided to 
+release the new version of MSS, version 1.1.</P>
+
+<P>In 2000, Peter stated in a private mail to Laurynas Biveinis that he would
+hand over maintenance of MSS if somebody comes up. In 2001, Laurynas has made
+a few bugfixes to MSS and wanted to publish them. However, this time both 
+authors didn't reply to any mails, so Laurynas just went on and uploaded version
+1.2.1 to SimtelNet. But he is not claiming maintenance of MSS and would be happy
+to hand over his code to anybody wanting to become a maintainer.</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="changelog"><B>
+6.2 Changelog
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<H3>Version 0.90Beta</H3>
+<P>First public release:  It was called SENTINEL, but there is a commercial
+product with this same name, so it had to be changed. Sorry if this caused
+any confussion or inconvenience.</P>
+
+<H3>Version 0.91Beta</H3>
+<P>September 1997:</P>
+<P>
+<UL>
+<LI>Changed name to &quot;MSS&quot;.</LI>
+<LI>Corrected a bug related to NULL pointer deallocation (Thanks to Miguel
+Murillo :)</LI>
+<LI>Added new functions: CHECK_POINTER, LOG_MSG.</LI>
+<LI> Corrected/updated  documentation.</LI>
+</UL>
+</P>
+
+<H3>Version 0.92Beta</H3>
+<P>October 1997:
+<UL>
+<LI> Added FINISH_MEM feature.</LI>
+</UL>
+</P>
+
+<H3>Version 0.93Beta</H3>
+<P>November 1997:</P>
+<P>
+<UL>
+<LI>Corrected a bug that caused a GPF when deallocating a NULL pointer.
+Thanks to Przemyslaw G. Gawronski for reporting this bug.</LI>
+<LI> Corrected a misfunction when linking pre-compiled modules.
+Thanks to Przemyslaw G. Gawronski for reporting this bug.</LI>
+<LI> Corrected/updated documentation. (Re-read!)</LI>
+</UL>
+</P>
+
+<H3>Version 0.95Beta (never released)</H3>
+
+<P>December 1998:</P>
+<P>
+<UL>
+<LI>Support for malloc() and free() added, as MSS was rewritten
+in C by Peter.</LI>
+<LI>The problem with allocations before main() not being detected by MSS
+was fixed.</LI>
+<LI>Some bugs were fixed.</LI>
+<LI>Added the possibility to log to either stdout or a user selectable
+logfile.</LI>
+<LI>Added the 'MSS_' prefix to all global functions in mss.c and cppspec.cc,
+and also the #defines in 'use_mss.h'.</LI>
+<LI>Changed the remaining Spanish variable names into english... Phew,
+finally something one can understand!</LI>
+</UL>
+</P>
+
+<H3>Version 0.96.2Beta (never released)</H3>
+
+<P>January 1998:</P>
+<P>
+<UL>
+<LI>Added support for realloc() and calloc().</LI>
+<LI>Added MALLOC_FAIL_PERCENTAGE.</LI>
+<LI>Added CHECK_ALL_ON_MALLOC</LI>
+<LI>Added MSS_DISABLE_THREADING and MSS_ENABLE_THREADING to make MSS
+multi-threading safe.</LI>
+<LI>Fixed a bug, which made new return NULL upon out-of-memory error.</LI>
+<LI>Added a feature, so that warnings were printed when trying to free()
+memory which was allocated by 'new' and vice versa.</LI>
+<LI>Added MSS_WORD_WRAP_LOG_FILE.</LI>
+<LI>Added MSS_ENTER_SCOPE, MSS_LEAVE_SCOPE</LI>
+<LI>Added logging possibilities to stderr.</LI>
+<LI>Made MSS ANSI C/C++ compliant(?). (It compiles okay with '-Wall -W
+-ansi -pedantic' on GCC anyway :)</LI>
+<LI>Removed the CHECK_CONSTANT_BLOCK command, since this is now covered
+by MSS_LOG_CHECK_BLOCK_AT().</LI>
+<LI>Moved some stuff from 'mss.h' to 'config.h', to avoid any name-conflicts
+with the user's program.  Now everything in 'mss.h' and 'use_mss.h' starts
+with 'MSS_' or 'mss_'.</LI>
+</UL>
+</P>
+
+<H3>Version 0.96.3Beta (never released)</H3>
+
+<P>January 1998:</P>
+<P>
+<UL>
+<LI>Removed the 'use_mss.h' file, and put everything in 'mss.h'.</LI>
+<LI>Added support for a Special Logfile, to be used by the post-mortem program.</LI>
+<LI>Tidied up the code a bit.</LI>
+<LI>Fixed a bug generating a SIGSEGV sometimes when writing the logfile to a file.
+(How did this go by unnoticed anyway by the way).</LI>
+<LI>Fixed a bug with the internal function check_if_initialized().</LI>
+<LI>Added a crappy makefile for Microsoft Visual C++ 1.5.</LI>
+</UL>
+</P>
+
+<H3>Version 1.0Beta</H3>
+<P>February 1998:</P>
+<P>
+<UL>
+<LI>Fixed a bug related to MSS prematurely exiting the program.</LI>
+<LI>Dumped `<CODE>config.h</CODE>&acute;, and added support for run-time configuration files.</LI>
+<LI>Rewrote the documentation in HTML... (time-consuming)</LI>
+<LI>Split MSS up into several source files, rewriting lots of stuff</LI>
+<LI>Added support for new[], delete[], xmalloc(), xrealloc(), xfree(), cfree() and strdup().</LI>
+<LI>Added MSS_SET_BLOCK_LABEL()</LI>
+<LI>Added MSS_DUMP_BLOCK()</LI>
+<LI>Added some new configuration options</LI>
+<LI>Fixed a lot of minor/major bugs that noone remembers</LI>
+</UL>
+
+<H3>Version 1.1</H3>
+<P>April 1998:</P>
+<P>
+<UL>
+<LI>Fixed a bug related to diffrent pointer size of diffrent platforms. (<CODE>MSS_PTR_SIZE_T</CODE> and <CODE>MSS_PRINTF_SIZE_T</CODE> was added).</LI>
+<LI>MSS now shows both the number of times an allocation/deallocation function was successfully executed <EM>and</EM> the number of times it was called.</LI>
+<LI>MSS now reports the size of a block being deallocated.</LI>
+<LI>You can now use hexadecimal numbers in the config files too.</LI>
+<LI>Fixed a bug in the pointer validity check. Wrong distance to nearest block was reported.</LI>
+<LI>Fixed a layout bug in the pointer validity check.</LI>
+<LI>Corrected some things in the documentation, and added some new information</LI>
+<LI>Added a config options to disable/enable normal log output</LI>
+<LI>Added a new function, <CODE>MSS_LOG_BLOCK_LIST_FILTERED</CODE>, thanks to Olaf Stoyke for contributing with this function.</LI>
+</UL>
+</P>
+
+<H3>Version 1.2</H3>
+<P>November 1998:</P>
+<P>
+<UL>
+<LI>Fixed a couple of lines not conforming to the ANSI C standard.</LI>
+<LI>Included a project file and documentation on how to compile and install MSS using Borland C++ 5.02. Thanx to Rolf F. Katzenberger
+for spending time doing this and sending the results to me (Peter).</LI>
+</UL>
+</P>
+
+<H3>Version 1.2.1 (current version, only minor updates)</H3>
+<P>Octover 2001:</P>
+<P>
+<UL>
+<LI>Written new header, &lt;no_mss.h&gt;.
+<LI>Removed all references to patching DJGPP libc 2.00.
+<LI>Now all functions can deallocate NULL without generating a warning, because
+it is legal with latest C and C++ standards.
+</UL>
+</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="to-do"><B>
+6.3 To-Do
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>We are working our way down the To-do list, and not many things are here
+right now.  If you are missing some feature in MSS and you can't find it in
+this list, please <A HREF="#contacting-the-authors">send us a comment</A>.  Any suggestions are appreciated.</P>
+<P>
+<UL>
+<LI>A post-mortem program that analyzes log file and tells you valuable info like bugs found, statistics and so... (There is some not even nearly finished stuff calling itself MSLAP, but it doesn't do very much at all yet).</LI>
+<LI>Better thread-safety, the one in this version is untested, so if you have any experience of this, <A HREF="#contacting-the-authors">please report it</A>.</LI>
+<LI>Monitoring of deallocated memory</LI>
+<LI>Better Sample programs... (You can help with this, please send any contributions to us!)</LI>
+<LI>Better looking and tidy code</LI>
+<LI>Better code ;)</LI>
+<LI>Cleanup Makefiles <I>--LB</I></LI>
+<LI>Find a good utility to convert HTML to text for generating mssdoc.txt and
+add its creation rules to doc/Makefile <I>--LB</I></LI>
+</UL>
+</P>
+
+
+
+<HR>
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="contacting-the-authors"><B>7. Contacting the authors</B></A></FONT></FONT>
+</TD></TR></TABLE>
+<P>
+<UL>
+<A HREF="#contact-general-info">7.1 General info</A><BR>
+<A HREF="#submitting-a-bug-report">7.2 Submitting a bug-report</A><BR>
+</UL>
+</P>
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="contact-general-info"><B>
+7.1 General info
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>MSS was written by Juan Jesus Alcolea Picazo, <A HREF="mailto:a920101@zipi.fi.upm.es">a920101@zipi.fi.upm.es</A> and Peter Palotas, <A HREF="mailto:blizzar@hem1.passagen.se">blizzar@hem1.passagen.se</A></P>
+<P>Any comments, suggestions and bugreports are very welcome. Please direct all such e-mails to Peter, since Juan are not currently working on MSS.</P>
+
+
+<P>&nbsp;</P><TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4" WIDTH="100%"><TR BGCOLOR="#FFFFC0"><TD><FONT SIZE=+2><FONT COLOR="#000080">
+<A NAME="submitting-a-bug-report"><B>
+7.2 Submitting a bug-report
+</B></A></FONT></FONT></TD></TR></TABLE>
+
+<P>If you are going to submit a bug report, the best thing you can do is to send us the logfile and the smallest source code possible
+to reproduce the bug. The second best thing to do is to send us the entire source-code to your program (if the source &lt; 50K).
+If the source code is large or you don't want to send it to us by some other reason, just send us the logfile and we'll see what
+we can do.</P>
+
+<P>And ofcourse, tell us what the problem is and what version of MSS you are using!</P>
+
+<HR>
+<TABLE CELLSPACING=2 CELLPADDING=4 BORDER=0 WIDTH="100%"><TR><TD BGCOLOR="#C0C0FF">
+<FONT SIZE="+3"><FONT COLOR="#000080"><A NAME="copyright"><B>8. Copyright</B></A></FONT></FONT>
+</TD></TR></TABLE>
+
+<P>
+<TABLE BORDER="0" CELLSPACING="2" CELLPADDING="4">
+<TR BGCOLOR="#FFFFC0"><TD>
+<PRE>
+     MSS -- Memory Supervision System version 1.2 Copyright &copy; 1998 Juan Jesus
+     Alcolea Picazo and Peter Palotas
+</PRE>
+<P>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</P>
+
+<P>This program is distributed in the hope that it will be useful, but <B>WITHOUT ANY WARRANTY</B>; without even the implied
+warranty of <B>MERCHANTABILITY</B> or <B>FITNESS FOR A PARTICULAR PURPOSE</B>. See the GNU General Public License
+for more details.</P>
+
+<P>You should have received a copy of the <A HREF="copying.txt">GNU General Public License</A> along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</P>
+
+(See also <A HREF="#contacting-the-authors">Contacting the Authors</A>).
+</TD></TR></TABLE>
+</P>
+
+</BODY>
+</HTML>
